@@ -1,5 +1,5 @@
 % MODEL : Complex Recurrent Model on Transform2D dataset
-% CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/7e31d8741c9ba3d12587f7341f87afa4246807ef
+% CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/74052446370095b0e8260d877774af0e18e04c04
 %% Function Start Here
 function exprun(istart, initEstch, nloop, swLinBase)
 % default setttings
@@ -16,13 +16,12 @@ if ishpc
 end
 %% model parameters
 if ishpc
-    nepoch    = 10;
+    nepoch    = 20;
     nbatch    = 500;
     batchsize = 32;
     validsize = 128;
     swSave    = true;
 else
-
     nepoch    = 10;
     nbatch    = 3;
     batchsize = 8;
