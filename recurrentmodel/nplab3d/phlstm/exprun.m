@@ -54,12 +54,12 @@ if istart == 0
     imTransform = LinearTransform.randinit(stat.sizeout, nhidunit);
 else
     load(fullfile(savedir, sprintf(namept, istart)));
-    ampEncoder  = Interface.loaddump(ampencoderdump);
-    ampPredict  = Interface.loaddump(amppredictdump);
-    angEncoder  = Interface.loaddump(angencoderdump);
-    angPredict  = Interface.loaddump(angpredictdump);
-    reTransform = Interface.loaddump(retransformdump);
-    imTransform = Interface.loaddump(imtransformdump);
+    ampEncoder  = BuildingBlock.loaddump(ampencoderdump);
+    ampPredict  = BuildingBlock.loaddump(amppredictdump);
+    angEncoder  = BuildingBlock.loaddump(angencoderdump);
+    angPredict  = BuildingBlock.loaddump(angpredictdump);
+    reTransform = BuildingBlock.loaddump(retransformdump);
+    imTransform = BuildingBlock.loaddump(imtransformdump);
 end
 ampEncoder.stateAheadof(ampPredict);
 angEncoder.stateAheadof(angPredict);

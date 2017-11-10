@@ -5,7 +5,7 @@ nhidunit = 1024;
 validsize = 8;
 whitenSizeOut = 512;
 %% enviroment variables
-istart  = 5e4;
+istart  = 7e4;
 taskid  = ['COMPGEN', num2str(nhidunit), 'TRANSFORM2D'];
 taskdir = exproot();
 savedir = fullfile(taskdir, 'records');
@@ -17,7 +17,7 @@ dataset = Transform2D();
 framesize = dataset.framesize;
 %% load statistic information
 load(fullfile(datadir, 'statrans_transform2d.mat'));
-stunit = Interface.loaddump(stdump);
+stunit = BuildingBlock.loaddump(stdump);
 stunit.compressOutput(whitenSizeOut);
 stunit.frozen = true;
 % connect to dataset
@@ -26,7 +26,7 @@ stunit.appendto(dataset.data);
 stat = stunit.getKernel(framesize);
 %% load units and model
 load(fullfile(savedir, sprintf(namept, istart)));
-model = Interface.loaddump(modeldump);
+model = BuildingBlock.loaddump(modeldump);
 model.I{1}.objweight = stat.pixelweight;
 model.O{1}.addPrior('cauchy', 'stdvar', sqrt(2));
 model.O{1}.addPrior('slow',   'stdvar', sqrt(2));
@@ -37,8 +37,8 @@ model.appendto(stunit);
 model.inferOption = struct( ...
     'Method',      'lbfgs',  ...
     'Display',     'iter', ...
-    'MaxIter',     40,    ...
-    'MaxFunEvals', 50);
+    'MaxIter',     100,    ...
+    'MaxFunEvals', 110);
 %% reconstruction process
 dpkg = dataset.next(validsize);
 wpkg = stunit.forward(dpkg);

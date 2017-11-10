@@ -27,7 +27,7 @@ if istart == 0
     model = GenerativeUnit(PolarCLT.randinit(nhidunit, whitenSizeOut));
 else
     load(fullfile(savedir, sprintf(namept, istart)));
-    model = Interface.loaddump(modeldump);
+    model = BuildingBlock.loaddump(modeldump);
 end
 model.appendto(stunit);
 model.kernel.useCOModelNormalization = true;

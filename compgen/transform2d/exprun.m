@@ -44,7 +44,7 @@ dataset = Transform2D();
 framesize = dataset.framesize;
 %% load statistic information
 load(fullfile(datadir, 'statrans_transform2d.mat'));
-stunit = Interface.loaddump(stdump);
+stunit = BuildingBlock.loaddump(stdump);
 stunit.frozen = true;
 stunit.compressOutput(whitenSizeOut);
 stunit.appendto(dataset.data);
@@ -54,7 +54,7 @@ if istart == 0
     model = GenerativeUnit(PolarCLT.randinit(nhidunit, whitenSizeOut));
 else
     load(fullfile(savedir, sprintf(namept, istart)));
-    model = Interface.loaddump(modeldump);
+    model = BuildingBlock.loaddump(modeldump);
 end
 model.appendto(stunit);
 model.kernel.useCOModelNormalization = true;

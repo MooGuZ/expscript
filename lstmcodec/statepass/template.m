@@ -21,9 +21,9 @@ if istart == 0
     predict = PHLSTM.randinit(nhidunit, npixel, npixel);
 else
     load(fullfile(savedir, sprintf(namept, istart)));
-    encoder = Interface.loaddump(encoderdump);
-    decoder = Interface.loaddump(decoderdump);
-    predict = Interface.loaddump(predictdump);
+    encoder = BuildingBlock.loaddump(encoderdump);
+    decoder = BuildingBlock.loaddump(decoderdump);
+    predict = BuildingBlock.loaddump(predictdump);
 end
 encoder.stateAheadof(decoder).stateAheadof(predict);
 model = Model(encoder, decoder, predict);

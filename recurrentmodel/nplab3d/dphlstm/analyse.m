@@ -25,10 +25,10 @@ stunit.appendto(nplab3d.data);
 stat = stunit.getKernel(framesize);
 %% load model
 load(fullfile(savedir, sprintf(namept, istart)));
-encoder     = Interface.loaddump(encoderdump);
-predict     = Interface.loaddump(predictdump);
-reTransform = Interface.loaddump(retransformdump);
-imTransform = Interface.loaddump(imtransformdump);
+encoder     = BuildingBlock.loaddump(encoderdump);
+predict     = BuildingBlock.loaddump(predictdump);
+reTransform = BuildingBlock.loaddump(retransformdump);
+imTransform = BuildingBlock.loaddump(imtransformdump);
 % connection LSTMs
 encoder.stateAheadof(predict);
 % create assistant units

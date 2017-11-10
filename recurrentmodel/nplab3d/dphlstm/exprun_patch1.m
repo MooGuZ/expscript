@@ -53,10 +53,10 @@ stat      = whitening.getKernel(framesize);
 %     imTransform = LinearTransform.randinit(stat.sizeout, nhidunit);
 % else
     load(fullfile(savedir, sprintf(namept, istart)));
-    encoder     = Interface.loaddump(encoderdump);
-    predict     = Interface.loaddump(predictdump);
-    reTransform = Interface.loaddump(retransformdump);
-    imTransform = Interface.loaddump(imtransformdump);
+    encoder     = BuildingBlock.loaddump(encoderdump);
+    predict     = BuildingBlock.loaddump(predictdump);
+    reTransform = BuildingBlock.loaddump(retransformdump);
+    imTransform = BuildingBlock.loaddump(imtransformdump);
 % end
 encoder.stateAheadof(predict);
 % create assistant units

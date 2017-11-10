@@ -20,16 +20,16 @@ framesize = dataset.framesize;
 npixel    = prod(framesize);
 %% create stunit module
 load(fullfile(datadir, 'statrans_transform2d.mat'));
-stunit = Interface.loaddump(stdump);
+stunit = BuildingBlock.loaddump(stdump);
 stunit.compressOutput(nwhiten);
 stunit.frozen = true;
 stat = stunit.getKernel(framesize);
 %% load model
 load(fullfile(savedir, sprintf(namept, istart)));
-encoder     = Interface.loaddump(encoderdump);
-predict     = Interface.loaddump(predictdump);
-reTransform = Interface.loaddump(retransformdump);
-imTransform = Interface.loaddump(imtransformdump);
+encoder     = BuildingBlock.loaddump(encoderdump);
+predict     = BuildingBlock.loaddump(predictdump);
+reTransform = BuildingBlock.loaddump(retransformdump);
+imTransform = BuildingBlock.loaddump(imtransformdump);
 % connection LSTMs
 encoder.stateAheadof(predict);
 % create assistant units
