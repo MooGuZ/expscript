@@ -1,7 +1,7 @@
 function [bir, mir] = nnconv(probScale, ntry, batchsize)
 useGPU  = logical(gpuDeviceCount);
 verstr  = version('-release');
-ver2017 = str2double(verstr(1:4)) >= 2017;
+newVer  = not(ispc) && (str2double(verstr(1:4)) >= 2017);
 % default values
 if not(exist('batchsize', 'var')), batchsize = 1; end
 % calculate fundamental paramters
@@ -12,11 +12,14 @@ nfilter  = nchannel;
 padding  = { ...
     floor(fltsize(1) / 2), floor(fltsize(2) / 2), ...
     floor((fltsize(1) - 1) / 2), floor((fltsize(2) - 1) / 2)};
+% issym = (padding{1} == padding{3}) && (padding{2} == padding{4});
 % use gpu version if possible
 if useGPU
-    bifunc = @nnet.internal.cnngpu.convolveForward2D;
+    bifunc = @(varargin) gather(nnet.internal.cnngpu.convolveForward2D(varargin{:}));
+    mifunc = @(varargin) gather(MathLib.nnconv(varargin{:}));
 else
     bifunc = @nnet.internal.cnnhost.convolveForward2D;
+    mifunc = @MathLib.nnconv;
 end
 % generate filter
 f = randn([fltsize, nchannel, nfilter]);
@@ -34,13 +37,8 @@ for i = 1 : ntry
     if useGPU
         data = gpuArray(data);
     end
-    % run my implementation
-    tstart = tic;
-    mir = MathLib.nnconv(data, f, b, 'same');
-    etime = toc(tstart);
-    mitime = mitime + etime;
     % run build-in function
-    if ver2017
+    if newVer
         tstart = tic;
         bir = bifunc(data, f, padding{:}, 1, 1) + b;
         etime = toc(tstart);
@@ -50,6 +48,11 @@ for i = 1 : ntry
         etime = toc(tstart);
     end
     bitime = bitime + etime;
+    % run my implementation
+    tstart = tic;
+    mir = mifunc(data, f, b, 'same');
+    etime = toc(tstart);
+    mitime = mitime + etime;
 end
 bitime = bitime / batchsize / ntry;
 mitime = mitime / batchsize / ntry;
