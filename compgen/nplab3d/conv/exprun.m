@@ -1,5 +1,5 @@
 % MODEL : Complex Generative Model on NPLab3D Dataset
-% CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/f1a743df671bc76ef17b0f07a4a4697e0b2fdbc5
+% CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/d145b9582f8fa3ea1ce65b0da6721e3498236535
 function model = exprun(istart, initEstch, nepoch)
 %% check environment
 ishpc = isunix && not(ismac);
@@ -21,14 +21,14 @@ end
 %% model parameters
 if ishpc
     nchannel  = 32;
-    nbatch    = 1000;
-    batchsize = 1;
+    nbatch    = 100;
+    batchsize = 8;
     validsize = 128;
     taskopt   = {};
 else
     nchannel  = 8;
     nbatch    = 3;
-    batchsize = 1;
+    batchsize = 4;
     validsize = 32;
     taskopt   = {'-nosave'};
 end
