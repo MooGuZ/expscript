@@ -1,5 +1,8 @@
 % MODEL : LSTM Codec on NPLab3D dataset
 % CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/d145b9582f8fa3ea1ce65b0da6721e3498236535
+
+function exprun(istart, initEstch, nepoch)
+
 %% check environment
 ishpc = isunix && not(ismac);
 %% load package to MATLAB search path
@@ -7,30 +10,29 @@ if ishpc
     addpath('/home/hxz244'); 
     pathLoader('umpoo');
 end
+%% setup default values
+if not(exist('istart', 'var')), istart = 0; end
+if not(exist('initEstch', 'var')), initEstch = 1e-3; end
+if not(exist('nepoch', 'var')), nepoch = 10; end
 %% model parameters
 if ishpc
     nhidunit  = 1536;
     nloop     = 10;
-    nepoch    = 10;
     nbatch    = 500;
     batchsize = 32;
     validsize = 128;
-    taskdir   = fileparts(mfilename('fullpath'));
 else
     nhidunit  = 64;
     nloop     = 3;
-    nepoch    = 3;
     nbatch    = 7;
     batchsize = 8;
     validsize = 32;
-    taskdir   = pwd();
 end
 nwhiten = 269;
 nframeEncoder = 15;
 nframePredict = 15;
-initEstch = 1e-3;
 %% environment parameters
-istart  = 0;
+taskdir = exproot();
 taskid  = ['LSTMCODEC', num2str(nhidunit), 'NPLAB3D'];
 savedir = fullfile(taskdir, 'records');
 datadir = fullfile(taskdir, 'data');
@@ -38,7 +40,7 @@ namept  = [taskid, '-ITER%d-DUMP.mat'];
 %% load dataset and parameter setup
 load(fullfile(datadir, 'nplab3d.mat'));
 framesize = nplab3d.stat.smpsize;
-npixel    = prod(framesize);
+% npixel    = prod(framesize);
 %% create whitening module
 whitening = StatisticTransform(nplab3d.stat, 'mode', 'whiten').appendto(nplab3d.data);
 whitening.compressOutput(nwhiten);
