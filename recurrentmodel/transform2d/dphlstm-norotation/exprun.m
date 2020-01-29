@@ -23,7 +23,7 @@ if ishpc
     swSave    = true;
 else
     nepoch    = 10;
-    nbatch    = 100;
+    nbatch    = 500;
     batchsize = 32;
     validsize = 128;
     swSave    = true;
@@ -35,11 +35,7 @@ nframeEncoder = 15;
 nframePredict = 15;
 %% environment parameters
 taskdir = exproot();
-if swLinBase
-    taskid = ['DPHLSTM', num2str(nhidunit), 'TRANSFORM2D-NOROT-EVBASE'];
-else
-    taskid  = ['DPHLSTM', num2str(nhidunit), 'TRANSFORM2D-NOROT'];
-end
+taskid  = ['DPHLSTM', num2str(nhidunit), 'TRANSFORM2D-NOROT'];
 savedir = fullfile(taskdir, 'records');
 datadir = fullfile(taskdir, 'data');
 namept  = [taskid, '-ITER%d-DUMP.mat'];
@@ -60,12 +56,28 @@ if istart == 0
     predict     = DPHLSTM.randinit(nhidunit, [], nbases);
     reTransform = LinearTransform.randinit(stat.sizeout, nhidunit);
     imTransform = LinearTransform.randinit(stat.sizeout, nhidunit);
+    cotransform = PolarCLT(comodel.rweight, comodel.iweight, zeros(stat.sizeout, 1));
+    if not(swLinBase)
+        cotransform.freeze();
+    end
 else
     load(fullfile(savedir, sprintf(namept, istart)));
     encoder     = BuildingBlock.loaddump(encoderdump);
     predict     = BuildingBlock.loaddump(predictdump);
     reTransform = BuildingBlock.loaddump(retransformdump);
     imTransform = BuildingBlock.loaddump(imtransformdump);
+    % load/create COTransform
+    if exist('cotransformdum', 'var')
+        cotransform = BuildingBlock.loaddump(cotransformdump);
+    else
+        cotransform = PolarCLT(comodel.rweight, comodel.iweight, zeros(stat.sizeout, 1));
+    end
+    % make it evolvable or not according to the option
+    if swLinBase
+        cotransform.unfreeze();
+    else
+        cotransform.freeze();
+    end
 end
 encoder.stateAheadof(predict);
 % create assistant units
@@ -85,11 +97,7 @@ prevnet = Model(whitening, inputSlicer, outputSlicer, outputShaper);
 ampact = SimpleActivation('ReLU').appendto(predict.DO{1});
 angact = SimpleActivation('tanh').appendto(predict.DO{2});
 angscaler = Scaler(pi).appendto(angact);
-cotransform = PolarCLT(comodel.rweight, comodel.iweight, zeros(stat.sizeout, 1)).appendto( ...
-    ampact, angscaler);
-if not(swLinBase)
-    cotransform.freeze();
-end
+cotransform.appendto(ampact, angscaler);
 dewhiten = LinearTransform(stat.decode, stat.offset(:)).appendto(cotransform).freeze();
 postnet = Model(ampact, angact, angscaler, cotransform, dewhiten);
 %% create zero generators
@@ -121,8 +129,15 @@ for i = 1 : nloop
         predictdump     = predict.dump();
         retransformdump = reTransform.dump();
         imtransformdump = imTransform.dump();
-        save(fullfile(savedir, sprintf(namept, task.iteration)), ...
-            'encoderdump', 'predictdump', 'retransformdump', 'imtransformdump', '-v7.3');
+        if swLinBase || exist('cotransformdump', 'var')
+            cotransformdump = cotransform.dump();
+            save(fullfile(savedir, sprintf(namept, task.iteration)), ...
+                'encoderdump', 'predictdump', 'retransformdump', 'imtransformdump', ...
+                'cotransformdump', '-v7.3');
+        else
+            save(fullfile(savedir, sprintf(namept, task.iteration)), ...
+                'encoderdump', 'predictdump', 'retransformdump', 'imtransformdump', '-v7.3');
+        end
         if not(isempty(latestsave))
             delete(latestsave);
         end
