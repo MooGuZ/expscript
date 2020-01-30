@@ -6,7 +6,7 @@ nhidunit = 1024;
 nframeEncoder = 15;
 nframePredict = 15;
 %% enviroment variables
-istart  = 1e4;
+istart  = 4e4;
 taskid  = ['DPHLSTM', num2str(nhidunit), 'TRANSFORM2D-NOROT'];
 taskdir = exproot();
 savedir = fullfile(taskdir, 'records');
@@ -30,6 +30,11 @@ encoder     = BuildingBlock.loaddump(encoderdump);
 predict     = BuildingBlock.loaddump(predictdump);
 reTransform = BuildingBlock.loaddump(retransformdump);
 imTransform = BuildingBlock.loaddump(imtransformdump);
+if exist('cotransformdump', 'var')
+    cotransform = BuildingBlock.loaddump(cotransformdump);
+else
+    cotransform = PolarCLT(comodel.rweight, comodel.iweight, zeros(stat.sizeout, 1));
+end
 % connection LSTMs
 encoder.stateAheadof(predict);
 % create assistant units
@@ -49,8 +54,7 @@ prevnet = Model(stunit, inputSlicer, outputSlicer);
 ampact = SimpleActivation('ReLU').appendto(predict.DO{1});
 angact = SimpleActivation('tanh').appendto(predict.DO{2});
 angscaler = Scaler(pi).appendto(angact);
-cotransform = PolarCLT(comodel.rweight, comodel.iweight, zeros(stat.sizeout, 1)).appendto( ...
-    ampact, angscaler);
+cotransform.appendto(ampact, angscaler);
 dewhiten = LinearTransform(stat.decode, stat.offset(:)).appendto(cotransform);
 postnet = Model(ampact, angact, angscaler, cotransform, dewhiten);
 %% create zero generators
