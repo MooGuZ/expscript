@@ -1,4 +1,4 @@
-% MODEL : Complex Recurrent Model on Transform2D dataset (translation only)
+% MODEL : Complex Recurrent Model on Transform2D dataset (scaling only)
 % CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/fa8fbe3bbea346bcac944338a8a1873cec8258d2
 %% Function Start Here
 function exprun(istart, initEstch, nloop, swLinBase)

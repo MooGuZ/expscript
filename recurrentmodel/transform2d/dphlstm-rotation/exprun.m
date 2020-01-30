@@ -1,4 +1,4 @@
-% MODEL : Complex Recurrent Model on Transform2D dataset (translation only)
+% MODEL : Complex Recurrent Model on Transform2D dataset (rotation only)
 % CODE  : https://github.com/MooGuZ/UMPrest.OO/commit/fa8fbe3bbea346bcac944338a8a1873cec8258d2
 %% Function Start Here
 function exprun(istart, initEstch, nloop, swLinBase)
@@ -42,7 +42,7 @@ namept  = [taskid, '-ITER%d-DUMP.mat'];
 %% load dataset and parameter setup
 dataset = Transform2D('nobjects', 1, ...
     'nframes', nframeEncoder + nframePredict, ...
-    'translation', 0, 'scaling', 0);
+    'translation', 0, 'scaling', 1);
 framesize = dataset.framesize;
 %% load linear bases
 comodel = load(fullfile(datadir, 'comodel_transform2d.mat'));

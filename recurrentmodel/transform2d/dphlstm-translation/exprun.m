@@ -42,7 +42,7 @@ namept  = [taskid, '-ITER%d-DUMP.mat'];
 %% load dataset and parameter setup
 dataset = Transform2D('nobjects', 1, ...
     'nframes', nframeEncoder + nframePredict, ...
-    'rotation', 0, 'scaling', 0);
+    'rotation', 0, 'scaling', 1);
 framesize = dataset.framesize;
 %% load linear bases
 comodel = load(fullfile(datadir, 'comodel_transform2d.mat'));
