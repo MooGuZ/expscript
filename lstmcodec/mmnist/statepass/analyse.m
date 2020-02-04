@@ -1,8 +1,8 @@
 %% load trained-model
-load records/UNCOND2048-ITER100000-DUMP.mat
+load records/UNIT2048-ITER50000-DUMP.mat
 mcode = 'UNCOND';
 %% setup experiments
-nframes  = 20;
+nframes  = 50;
 ncdfrms  = 10;
 %% build model
 encoder = BuildingBlock.loaddump(encoderdump);
@@ -68,13 +68,13 @@ decoderListeners = { ...
     'NewCellState',    Listener(decoder.stateNew.O{1}); ...
     'NewHiddenState',  Listener(decoder.output.O{1});};    
 %% sample counter
-t = 67;
+t = 1;
 %% Generate Sample
 sample = dataset.next();
 t = t + 1;
 %% setup decoder & predict
-decoder.enableSelfeed(9);
-predict.enableSelfeed(9);
+decoder.enableSelfeed(ncdfrms-1);
+predict.enableSelfeed(nframes-ncdfrms-1);
 %% Conditional Composite Model with Predicted Frames as Input
 condString   = 'SemiConditional';
 encoderInput = fslicer.forward(sample);
@@ -94,7 +94,7 @@ predict.disableSelfeed();
 condString   = 'Conditional';
 encoderInput = fslicer.forward(sample);
 predictRefer = bslicer.forward(sample);
-decoderInput = sslicer.forward(addon.forward(reverse.forward(encoderInput)));
+decoderInput = fslicer.forward(addon.forward(reverse.forward(encoderInput)));
 predictInput = sslicer.forward(addon.forward(predictRefer));
 encoder.DI{1}.push(encoderInput);
 encoder.forward();
@@ -106,7 +106,7 @@ predictOutput = logact.forward(predict.forward());
 condString   = 'Unconditional';
 encoderInput = fslicer.forward(sample);
 predictRefer = bslicer.forward(sample);
-decoderInput = DataPackage(zeros(decoder.smpsize('in'), nframes - ncdfrms), 1, true);
+decoderInput = DataPackage(zeros(decoder.smpsize('in'), ncdfrms), 1, true);
 predictInput = DataPackage(zeros(predict.smpsize('in'), nframes - ncdfrms), 1, true);
 encoder.DI{1}.push(encoderInput);
 encoder.forward();
@@ -115,10 +115,10 @@ predict.DI{1}.push(predictInput);
 decoderOutput = reverse.forward(logact.forward(decoder.forward()));
 predictOutput = logact.forward(predict.forward());
 %% Unconditional Composite 2-Layer Model
-condString   = 'Unconditional';
+condString   = 'MultiLayer';
 encoderInput = fslicer.forward(sample);
 predictRefer = bslicer.forward(sample);
-decoderInput = DataPackage(zeros(decoder1L.smpsize('in'), nframes - ncdfrms), 1, true);
+decoderInput = DataPackage(zeros(decoder1L.smpsize('in'), ncdfrms), 1, true);
 predictInput = DataPackage(zeros(predict1L.smpsize('in'), nframes - ncdfrms), 1, true);
 encoder1L.DI{1}.push(encoderInput);
 encoder1L.forward();
@@ -130,13 +130,13 @@ decoderOutput = reverse.forward(logact.forward(decoder2L.forward()));
 predict1L.forward();
 predictOutput = logact.forward(predict2L.forward());
 %% define save file name pattern
-smpnmpt  = @(type, index) sprintf('fig/Sample-%02d-%s.gif', index, type);
+smpnmpt  = @(type, index, cond) sprintf('fig/%s-Sample%02d-%s.gif', cond, index, type);
 basenmpt = @(type, md, cond)  sprintf('fig/Base-%s-%s-%s.png', cond, md, type);
 %% save animations
-anim2gif(encoderInput.vectorize().data, smpnmpt('input', t), 'framerate', 12);
-anim2gif(decoderOutput.data, smpnmpt('decoded', t), 'framerate', 12);
-anim2gif(predictOutput.data, smpnmpt('predict', t), 'framerate', 12);
-anim2gif(predictRefer.vectorize().data,  smpnmpt('future', t), 'framerate', 12);
+anim2gif(encoderInput.vectorize().data, smpnmpt('input', t, condString), 'framerate', 12);
+anim2gif(decoderOutput.data, smpnmpt('decoded', t, condString), 'framerate', 12);
+anim2gif(predictOutput.data, smpnmpt('predict', t, condString), 'framerate', 12);
+anim2gif(predictRefer.vectorize().data,  smpnmpt('future', t, condString), 'framerate', 12);
 %% draw bases of decoder and predict
 encoderBase = encoder.inputTransform.weight;
 decoderBase = decoder.outputTransform.weight;

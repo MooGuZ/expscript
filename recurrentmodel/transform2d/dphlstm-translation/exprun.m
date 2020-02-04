@@ -103,7 +103,7 @@ cotransform.appendto(ampact, angscaler);
 dewhiten = LinearTransform(stat.decode, stat.offset(:)).appendto(cotransform).freeze();
 postnet = Model(ampact, angact, angscaler, cotransform, dewhiten);
 %% create zero generators
-zerogen = DataGenerator('zero', nhidunit, 'tmode', nframeEncoder);
+zerogen = DataGenerator('zero', nhidunit, 'tmode', nframePredict);
 zerogen.data.connect(predict.DI{1});
 zerogen.data.connect(predict.DI{2});
 errgen = DataGenerator('zero', nhidunit, 'tmode', nframeEncoder, '-errmode');

@@ -2,7 +2,6 @@
 % CODE  : 
 %% model parameters
 nhidunit = 1024;
-validsize = 8;
 whitenSizeOut = 269;
 %% enviroment variables
 istart  = 2e4;
@@ -42,7 +41,7 @@ model.inferOption = struct( ...
     'MaxIter',     100,    ...
     'MaxFunEvals', 110);
 %% reconstruction process
-dpkg = dataset.next(validsize);
+dpkg = dataset.next(32);
 wpkg = stunit.forward(dpkg);
 [alpha, phi] = model.forward(wpkg);
 rwpkg = model.backward(alpha, phi);
@@ -52,4 +51,6 @@ rpkg  = stunit.backward(rwpkg);
 fprintf('Objective Value :  %.5e <L:%.2e| P:%.2e>\n', likelihood + prior, likelihood, prior);
 %% show animation
 animview({dpkg, rpkg});
+%% save animations
+save(fullfile(plotdir, [taskid, '-ITER', num2str(istart), '-Sample.mat']), 'dpkg', 'rpkg', '-v7.3');
 %% END
