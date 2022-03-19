@@ -67,8 +67,8 @@ errgen = DataGenerator('zero', nhidunit, 'tmode', nframeEncoder, '-errmode');
 errgen.data.connect(encoder.DO{1});
 errgen.data.connect(encoder.DO{2});
 %% get test sample
-dataset.next(32);
-zerogen.next(32);
+dataset.next(128);
+zerogen.next(128);
 prevnet.forward();
 model.forward();
 postnet.forward();

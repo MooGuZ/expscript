@@ -6,7 +6,7 @@ nhidunit = 1024;
 nframeEncoder = 15;
 nframePredict = 15;
 %% enviroment variables
-istart  = 2e4;
+istart  = 1e4;
 taskid  = ['DPHLSTM', num2str(nhidunit), 'T2DROTATE'];
 taskdir = exproot();
 savedir = fullfile(taskdir, 'records');
@@ -67,8 +67,8 @@ errgen = DataGenerator('zero', nhidunit, 'tmode', nframeEncoder, '-errmode');
 errgen.data.connect(encoder.DO{1});
 errgen.data.connect(encoder.DO{2});
 %% get test sample
-dataset.next(32);
-zerogen.next(32);
+dataset.next(128);
+zerogen.next(128);
 prevnet.forward();
 model.forward();
 postnet.forward();
